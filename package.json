@@ -1,0 +1,19 @@
+{
+  "name": "@itharbors/module",
+  "version": "0.1.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npx tsc",
+    "test": "node --test ./test/*.spec.js",
+    "ci": "npm install && npm run build && npm run test"
+  },
+  "author": "VisualSJ",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
