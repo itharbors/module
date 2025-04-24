@@ -1,10 +1,3 @@
-# Module System
-
-一个简易的模块管理系统，主要职责：
-1. 管理模块列表
-2. 管理模块的生命周期
-3. 定义模块间的交互方式
-
 # 模块设计文档: Module System
 
 [![NPM](https://img.shields.io/npm/v/@itharbors/module)](https://www.npmjs.com/package/@itharbors/module)
@@ -99,30 +92,6 @@ exports.npm = function(params) {
 exports.tsc = function(params) {
     return ['./'];
 };
-```
-
-### 配置文件
-
-### 注册自定义任务
-
-```ts
-import { readFile } from 'fs';
-import { ModuleContainer, TModule } from '@itharbors/module';
-
-export class Plugin extends ModuleContainer {
-    public info: TPluginInfo;
-    public path: string;
-
-    constructor(path: string) {
-        const pkg = require(join(path, 'package.json'));
-        const module = require(pkg.main) as Partial<TModule>;
-        super({
-            stash: module.stash || function () { return {}; },
-            data: module.data || function () { return {}; },
-            method: module.method || {},
-        });
-    }
-}
 ```
 
 ## 决策点
