@@ -9,12 +9,9 @@ export class ModuleData<Data, Stash> {
     constructor(data: Data, stash: Stash) {
         this._data = data as Data;
         this.stash = stash;
-
     }
 
     private propertyEventMap: Partial<Record<keyof Data, ((value: any, legacy: any) => void)[]>> = {};
-
-    // _data data
 
     private _data: Data;
 
