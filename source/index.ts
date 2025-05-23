@@ -7,7 +7,7 @@ import { ModuleContainer } from './module';
  * @param module 
  * @returns 
  */
-export function generateModule<M extends TMethod, D extends () => TData, S extends () => TStash>(module: TModule<M, D, S>) {
+export function generateModule<M extends TMethod, D extends () => TData, S extends () => TStash>(module: TModule<{}, M, D, S>) {
     const container = new ModuleContainer(module);
     return container;
 }

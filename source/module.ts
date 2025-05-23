@@ -5,14 +5,14 @@ import { ModuleData } from './module-data';
 /**
  * 模块的容器
  */
-export class ModuleContainer<M extends TMethod = TMethod, D extends () => TData = () => TData, S extends () => TStash = () => TStash> {
-    private _module: TModule<M, D, S>;
+export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D extends () => TData = () => TData, S extends () => TStash = () => TStash> {
+    public module: TModule<C, M, D, S>;
     private _intance: ModuleData<D, S>;
 
     public status: TModuleStatus = 'idle';
 
-    constructor(module: TModule<M, D, S>) {
-        this._module = module;
+    constructor(module: TModule<C, M, D, S>) {
+        this.module = module;
         const data = module.data() as D;
         const stash = module.stash() as S;
         this._intance = new ModuleData<D, S>(data, stash);
@@ -29,8 +29,8 @@ export class ModuleContainer<M extends TMethod = TMethod, D extends () => TData 
                 if (this.status !== 'idle') {
                     throw new Error('The life cycle cannot be executed');
                 }
-                if (this._module[name]) {
-                    await this._module[name]?.call(this._intance);
+                if (this.module[name]) {
+                    await this.module[name]?.call(this._intance);
                 }
                 this.status = 'pendding';
                 break;
@@ -39,8 +39,8 @@ export class ModuleContainer<M extends TMethod = TMethod, D extends () => TData 
                 if (this.status !== 'pendding') {
                     throw new Error('The life cycle cannot be executed');
                 }
-                if (this._module[name]) {
-                    await this._module[name]?.call(this._intance);
+                if (this.module[name]) {
+                    await this.module[name]?.call(this._intance);
                 }
                 this.status = 'running';
                 break;
@@ -49,8 +49,8 @@ export class ModuleContainer<M extends TMethod = TMethod, D extends () => TData 
                 if (this.status !== 'running') {
                     throw new Error('The life cycle cannot be executed');
                 }
-                if (this._module[name]) {
-                    await this._module[name]?.call(this._intance);
+                if (this.module[name]) {
+                    await this.module[name]?.call(this._intance);
                 }
                 this.status = 'pendding';
                 break;
@@ -59,8 +59,8 @@ export class ModuleContainer<M extends TMethod = TMethod, D extends () => TData 
                 if (this.status !== 'pendding') {
                     throw new Error('The life cycle cannot be executed');
                 }
-                if (this._module[name]) {
-                    await this._module[name]?.call(this._intance);
+                if (this.module[name]) {
+                    await this.module[name]?.call(this._intance);
                 }
                 this.status = 'idle';
                 break;
@@ -73,7 +73,7 @@ export class ModuleContainer<M extends TMethod = TMethod, D extends () => TData 
      * @param name 
      */
     public async execture<K extends keyof M>(name: K, ...args: Parameters<M[K]>): Promise<ReturnType<M[K]>> {
-        const methods = this._module['method'] as M;
+        const methods = this.module['method'] as M;
         const result = await methods[name].call(this._intance, ...args);
         return result;
     }

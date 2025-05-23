@@ -21,7 +21,7 @@ export type TModuleLifeCycle = {
 }
 
 // 模块扩展数据相关属性
-export type TModuleExtraData<M, D, S> = {
+export type TModuleExtraData<C, M, D, S> = {
     // 方法集合
     method: M;
 
@@ -30,11 +30,12 @@ export type TModuleExtraData<M, D, S> = {
 
     // 暂存区域，一般放一些临时对象，例如 map、array 等缓存
     stash: S;
-}
+} & C;
 
 // 聚合模块定义
 export type TModule<
+    C extends {} = {},
     M = TMethod,
     D extends () => TData = () => TData,
     S extends () => TStash = () => TStash,
-> = TModuleLifeCycle & TModuleExtraData<M, D, S> & ThisType<ModuleData<ReturnType<D>, ReturnType<S>>>;
+> = TModuleLifeCycle & TModuleExtraData<C, M, D, S> & ThisType<ModuleData<ReturnType<D>, ReturnType<S>>>;
