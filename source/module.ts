@@ -16,6 +16,8 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
         this._module = module;
         const data = module.data() as D;
         this._data = new ModuleData<D>(data);
+        // @ts-ignore
+        this.stash.data = this._data;
     }
 
     /**
@@ -30,7 +32,7 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
                     throw new Error('The life cycle cannot be executed');
                 }
                 if (this._module.register) {
-                    await this._module.register?.call(this._data);
+                    await this._module.register?.call(this.stash);
                 }
                 this.status = 'pendding';
                 break;
@@ -40,7 +42,7 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
                     throw new Error('The life cycle cannot be executed');
                 }
                 if (this._module.load) {
-                    await this._module.load?.call(this._data);
+                    await this._module.load?.call(this.stash);
                 }
                 this.status = 'running';
                 break;
@@ -50,7 +52,7 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
                     throw new Error('The life cycle cannot be executed');
                 }
                 if (this._module.unload) {
-                    await this._module.unload?.call(this._data);
+                    await this._module.unload?.call(this.stash);
                 }
                 this.status = 'pendding';
                 break;
@@ -60,7 +62,7 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
                     throw new Error('The life cycle cannot be executed');
                 }
                 if (this._module.unregister) {
-                    await this._module.unregister?.call(this._data);
+                    await this._module.unregister?.call(this.stash);
                 }
                 this.status = 'idle';
                 break;
