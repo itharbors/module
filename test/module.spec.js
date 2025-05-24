@@ -10,7 +10,7 @@ test('module', async function() {
         const module = new ModuleContainer({
             async register() { results.push('register'); },
             async unregister() { results.push('unregister'); },
-            async load() { results.push('load'); },
+            async load() { results.push('load'); return { $html: 'html', }; },
             async unload() { results.push('unload'); },
             data() {
                 return {};
@@ -49,19 +49,29 @@ test('module', async function() {
             data() {
                 return {};
             },
-            stash() {
-                return {};
-            },
             method: {
                 async test(num) {
                     return num + 1;
                 },
+                async stash() {
+                    return this.$html;
+                },
             },
         });
+
+        module.stash.$html = 'html';
+
+        await module.run('register');
+        await module.run('load');
 
         await it('result', async () => {
             const num = await module.execture('test', 1);
             equal(num, 2);
+        });
+
+        await it('stash', async () => {
+            const html = await module.execture('stash');
+            equal(html, 'html');
         });
     });
 });

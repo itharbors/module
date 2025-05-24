@@ -5,17 +5,17 @@ import { ModuleData } from './module-data';
 /**
  * 模块的容器
  */
-export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D extends () => TData = () => TData, S extends () => TStash = () => TStash> {
-    public module: TModule<C, M, D, S>;
-    private _intance: ModuleData<D, S>;
+export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D extends () => TData = () => TData> {
+    private _module: TModule<C, M, D>;
+    private _data: ModuleData<D>;
+    public stash: C = {} as C;
 
     public status: TModuleStatus = 'idle';
 
-    constructor(module: TModule<C, M, D, S>) {
-        this.module = module;
+    constructor(module: TModule<C, M, D>) {
+        this._module = module;
         const data = module.data() as D;
-        const stash = module.stash() as S;
-        this._intance = new ModuleData<D, S>(data, stash);
+        this._data = new ModuleData<D>(data);
     }
 
     /**
@@ -29,8 +29,8 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
                 if (this.status !== 'idle') {
                     throw new Error('The life cycle cannot be executed');
                 }
-                if (this.module[name]) {
-                    await this.module[name]?.call(this._intance);
+                if (this._module.register) {
+                    await this._module.register?.call(this._data);
                 }
                 this.status = 'pendding';
                 break;
@@ -39,8 +39,8 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
                 if (this.status !== 'pendding') {
                     throw new Error('The life cycle cannot be executed');
                 }
-                if (this.module[name]) {
-                    await this.module[name]?.call(this._intance);
+                if (this._module.load) {
+                    await this._module.load?.call(this._data);
                 }
                 this.status = 'running';
                 break;
@@ -49,8 +49,8 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
                 if (this.status !== 'running') {
                     throw new Error('The life cycle cannot be executed');
                 }
-                if (this.module[name]) {
-                    await this.module[name]?.call(this._intance);
+                if (this._module.unload) {
+                    await this._module.unload?.call(this._data);
                 }
                 this.status = 'pendding';
                 break;
@@ -59,8 +59,8 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
                 if (this.status !== 'pendding') {
                     throw new Error('The life cycle cannot be executed');
                 }
-                if (this.module[name]) {
-                    await this.module[name]?.call(this._intance);
+                if (this._module.unregister) {
+                    await this._module.unregister?.call(this._data);
                 }
                 this.status = 'idle';
                 break;
@@ -73,8 +73,8 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
      * @param name 
      */
     public async execture<K extends keyof M>(name: K, ...args: Parameters<M[K]>): Promise<ReturnType<M[K]>> {
-        const methods = this.module['method'] as M;
-        const result = await methods[name].call(this._intance, ...args);
+        const methods = this._module['method'] as M;
+        const result = await methods[name].call(this.stash, ...args);
         return result;
     }
 }

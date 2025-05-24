@@ -7,7 +7,7 @@ export type TMethod = Record<string, (...args: any) => any>;
 export type TData = Record<string, any>;
 
 // Stash 属性的定义
-export type TStash = Record<string, any>;
+export type TStash = Record<string, any> | undefined;
 
 // 生命周期的钩子列表
 export type TModuleLifeCycleKeys = 'register' | 'unregister' | 'load' | 'unload';
@@ -16,12 +16,14 @@ export type TModuleStatus = 'idle' | 'pendding' | 'running';
 
 // 模块生命周期相关函数
 export type TModuleLifeCycle = {
-    // 生命周期函数
-    [lifecycle in TModuleLifeCycleKeys]?: () => void;
+    register?: () => void;
+    unregister?: () => void;
+    load?: () => void;
+    unload?: () => void;
 }
 
 // 模块扩展数据相关属性
-export type TModuleExtraData<C, M, D, S> = {
+export type TModuleExtraData<M, D> = {
     // 方法集合
     method: M;
 
@@ -29,13 +31,17 @@ export type TModuleExtraData<C, M, D, S> = {
     data: D;
 
     // 暂存区域，一般放一些临时对象，例如 map、array 等缓存
-    stash: S;
-} & C;
+    // stash: S;
+};
 
 // 聚合模块定义
 export type TModule<
     C extends {} = {},
     M = TMethod,
     D extends () => TData = () => TData,
-    S extends () => TStash = () => TStash,
-> = TModuleLifeCycle & TModuleExtraData<C, M, D, S> & ThisType<ModuleData<ReturnType<D>, ReturnType<S>>>;
+> = TModuleLifeCycle & 
+    TModuleExtraData<M, D> & 
+    ThisType<
+        { data: ModuleData<ReturnType<D>> } &
+        C
+    >;

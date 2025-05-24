@@ -2,13 +2,10 @@
  * 简单的数据管理器
  * 负责管理数据，修改数据以及发送数据的修改事件
  */
-export class ModuleData<Data, Stash> {
+export class ModuleData<Data> {
 
-    public stash: Stash;
-
-    constructor(data: Data, stash: Stash) {
+    constructor(data: Data) {
         this._data = data as Data;
-        this.stash = stash;
     }
 
     private propertyEventMap: Partial<Record<keyof Data, ((value: any, legacy: any) => void)[]>> = {};
