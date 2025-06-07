@@ -1,4 +1,4 @@
-import type { TModule, TMethod, TData, TStash } from './types';
+import type { TModule } from './types';
 
 import { ModuleContainer } from './module';
 
@@ -7,11 +7,11 @@ import { ModuleContainer } from './module';
  * @param module 
  * @returns 
  */
-export function generateModule<M extends TMethod, D extends () => TData, S extends () => TStash>(module: TModule<{}, M, D>) {
-    const container = new ModuleContainer(module);
+export const generateModule = function<C extends {} = {}>(module: TModule<C>) {
+    const container = new ModuleContainer<C>(module);
     return container;
-}
+};
 
-export type { TModule, TMethod, TData, TStash } from './types';
+export type { TModule} from './types';
 
 export { ModuleContainer } from './module';

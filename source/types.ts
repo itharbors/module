@@ -6,9 +6,6 @@ export type TMethod = Record<string, (...args: any) => any>;
 // Data 属性的定义
 export type TData = Record<string, any>;
 
-// Stash 属性的定义
-export type TStash = Record<string, any> | undefined;
-
 // 生命周期的钩子列表
 export type TModuleLifeCycleKeys = 'register' | 'unregister' | 'load' | 'unload';
 

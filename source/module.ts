@@ -1,4 +1,4 @@
-import type { TModuleLifeCycleKeys, TModuleStatus, TModule, TMethod, TData, TStash } from './types';
+import type { TModuleLifeCycleKeys, TModuleStatus, TModule, TMethod, TData } from './types';
 
 import { ModuleData } from './module-data';
 
@@ -8,8 +8,12 @@ import { ModuleData } from './module-data';
 export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D extends () => TData = () => TData> {
     private _module: TModule<C, M, D>;
     private _data: ModuleData<D>;
+
+    // 暂存区域，一般放一些临时对象，例如 map、array 等缓存
+    // 生命周期函数、method 函数里可以使用 this 来访问
     public stash: C = {} as C;
 
+    // 模块容器状态
     public status: TModuleStatus = 'idle';
 
     constructor(module: TModule<C, M, D>) {
@@ -22,7 +26,6 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
 
     /**
      * 执行一个生命周期函数
-     *
      * @param name 
      */
     public async run(name: TModuleLifeCycleKeys) {
@@ -71,7 +74,6 @@ export class ModuleContainer<C extends {} = {}, M extends TMethod = TMethod, D e
 
     /**
      * 执行一个 methods 里的函数
-     *
      * @param name 
      */
     public async execture<K extends keyof M>(name: K, ...args: Parameters<M[K]>): Promise<ReturnType<M[K]>> {

@@ -34,25 +34,25 @@
 ```ts
 import { generateModule } from '@itharbors/module';
 
-export const instance = generateModule({
-    stash(): {} {
-        return {};
-    },
-
-    data(): {} {
-        return {};
-    },
-
-    register() {
-
+export const instance = generateModule<{
+    map: Map<string, string>;
+}>({
+    data() {
+        return {
+            num: 10,
+        };
     },
 
     register() {
+        this.map = new Map();
+    },
+
+    unregister() {
 
     },
 
     load() {
-
+        this.map.set('a', 'a');
     },
 
     unload() {
@@ -60,8 +60,9 @@ export const instance = generateModule({
     },
 
     method: {
-        async test(num: string) {
-            return num + 1;
+        async test(num: number) {
+            this.num += num;
+            return this.num;
         }
     },
 });
@@ -72,26 +73,7 @@ instance.run('load');
 instance.run('unload');
 instance.run('unregister');
 
-const num = await instance.execture('test', 1); // 2
-```
-
-```ts
-// params 是 initWorkflow 时传入的那个 params
-// 主要用于项目内控制部分流程，比如构建的时候只构建脚本、只构建样式等功能
-exports.remove = function(params) {
-    return ['./dist'];
-};
-exports.npm = function(params) {
-    return [{
-        message: '安装依赖',
-        path: './',
-        params: ['install'],
-        detail: '依赖安装失败，请检查网络和配置',
-    }];
-};
-exports.tsc = function(params) {
-    return ['./'];
-};
+const num = await instance.execture('test', 2); // 12
 ```
 
 ## 决策点
